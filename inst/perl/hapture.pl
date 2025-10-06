@@ -19,7 +19,7 @@ sub init(){
 	getopts( "hv:s:i:g:", \%opt ) or usage();
 	usage() if $opt{h};
 	print STDERR "Require path specification for VCF file: -v\n" and exit if not defined $opt{v};
-	print STDERR "Require path specification for SAM file: -s\n" and exit if not defined $opt{s};
+	print STDERR "Require path specification for BAM file: -s\n" and exit if not defined $opt{s};
 	print STDERR "Require individual ID: -i\n" and exit if not defined $opt{i};
 	print STDERR "Require group ID: -g \n" and exit if not defined $opt{g};
 }
@@ -27,17 +27,17 @@ sub init(){
 
 sub usage(){
 print STDERR << "EOF";
-    This program gathers variant haplotype sites from SAM alignment file, and reports a summary file for those variant sites
+    This program gathers variant haplotype sites from BAM alignment file, and reports a summary file for those variant sites
 
-    usage: $0 [-h] -v vcf_file -s sam_file -i int
+    usage: $0 [-h] -v vcf_file -s bam_file -i int
 
      -h        : this (help) message
      -v file   : variant caller file - VCF format (!! assumed the position is sorted)
-     -s file   : sequence alignment file - SAM format
+     -s file   : sequence alignment file - BAM format
      -i int    : individual ID (integer value or unbroken string)
      -g str    : group ID (unbroken string)
 
-    example: $0 -v s1.vcf -s s1.sam -i 0 -g sebastes
+    example: $0 -v s1.vcf -s s1.bam -i 0 -g sebastes
 
 EOF
         exit;
@@ -54,7 +54,7 @@ init();
 
 # Objective: keeps variants' info into memory so that
 # I can tell whether there are any variant sites for
-# the alignment read entry from the SAM file
+# the alignment read entry from the BAM file
 
 my $vcf; # a hash reference that keeps track of essential vcf info: reference variant, derived variants, pos
 my $hap;
@@ -85,8 +85,9 @@ close VCF;
 #----------------------------------------
 
 
-open SAM, $opt{s};
-while(<SAM>) {
+#open BAM, $opt{s}; # original line
+open( BAM, "samtools view $opt{s} |" ) or die "Cannot pipe from samtools view: $!\n\n";
+while(<BAM>) {
 	next if /^\@/;
 	my @lines = split "\t";
 	my $id = $lines[2];
