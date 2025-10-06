@@ -1,20 +1,3 @@
-#' Run shiny microhaplot
-#'
-#' Run shiny microhaplot app
-#' @param path Path to shiny microhaplot app. Optional. If not specified, the path is default to local app path.
-#' @return Runs shiny microhaplot application via \code{shiny::runApp} which typically doesn't return; interrupt R to stop the application (usually by pressing Ctrl+C or Esc).
-#' @export
-#' @examples
-#' if(interactive()){
-#' runShinyHaplot()
-#' }
-runShinyHaplot <- function(path = system.file("shiny", "microhaplot", package = "microhaplot")) {
-  if (path == "" || !file.exists(path)) {
-    #stop("Could not find Shiny directory. Try re-installing `mypackage`.", call. = FALSE)
-    stop("Could not find Shiny directory", call. = FALSE)
-  }
-  shiny::runApp(path, display.mode = "normal")
-}
 
 #' Transfer a copy of microhaplot app.
 #'
@@ -27,9 +10,9 @@ runShinyHaplot <- function(path = system.file("shiny", "microhaplot", package = 
 #' mvShinyHaplot(tempdir())
 #'
 mvShinyHaplot <- function(path) {
-  app.dir <- system.file("shiny", "microhaplot", package = "microhaplot")
+  app.dir <- system.file("shiny", "microhaplot", package = "microhaplotextract")
   if (app.dir == "") {
-    stop("Could not find shiny directory. Try re-installing `mypackage`.", call. = FALSE)
+    stop("Could not find microhaplotextract's installed `shiny` directory in the R library path. Try re-installing `microhaplotextract`.", call. = FALSE)
   }
 
   if (!file.exists(paste0(path))) dir.create(path)
@@ -91,7 +74,7 @@ prepHaplotFiles <- function(run.label, sam.path, label.path, vcf.path,
   n.jobs = 1){
 
   run.label <- gsub(" +","_",run.label)
-  haptureDir <- system.file("perl", "hapture", package = "microhaplot")
+  haptureDir <- system.file("perl", "hapture", package = "microhaplotextract")
 
   # Need to check whether all path and files exist
   if (!file.exists(sam.path)) stop("the path for 'sam.path' - ", sam.path, " does not exist")
