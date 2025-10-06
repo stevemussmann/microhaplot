@@ -67,7 +67,7 @@ mvShinyHaplot <- function(path) {
 #' }else {
 #' message("Perl version is outdated. Must >= 5.014.")}
 #'
-prepHaplotFiles <- function(run.label, sam.path, label.path, vcf.path,
+prepHaplotFiles <- function(run.label, bam.path, label.path, vcf.path,
   out.path=tempdir(),
   add.filter=FALSE,
   app.path=tempdir(),
@@ -77,7 +77,7 @@ prepHaplotFiles <- function(run.label, sam.path, label.path, vcf.path,
   haptureDir <- system.file("perl", "hapture", package = "microhaplotextract")
 
   # Need to check whether all path and files exist
-  if (!file.exists(sam.path)) stop("the path for 'sam.path' - ", sam.path, " does not exist")
+  if (!file.exists(bam.path)) stop("the path for 'bam.path' - ", bam.path, " does not exist")
   if (!file.exists(label.path)) stop("the path for 'label.path' - ", label.path, " does not exist")
   if (!file.exists(vcf.path)) stop("the path for 'vcf.path' - ", vcf.path, " does not exist")
   if (!file.exists(out.path)) stop("the path for 'out.path' - ", out.path, " does not exist")
@@ -131,12 +131,12 @@ prepHaplotFiles <- function(run.label, sam.path, label.path, vcf.path,
   garb <- sapply(1:nrow(read.label), function(i) {
 
     line <- read.label[i,] %>% unlist
-    if (!file.exists(file.path(sam.path,line[1]))) stop("the SAM file, ", file.path(sam.path,line[1]), ", does not exist")
+    if (!file.exists(file.path(bam.path,line[1]))) stop("the BAM file, ", file.path(bam.path,line[1]), ", does not exist")
 
     if(.Platform$OS.type == "windows") {
       run.perl.script <- paste0("perl ", haptureDir,
                                 " -v ", vcf.path, " ",
-                                " -s ", sam.path, "\\", line[1],
+                                " -s ", bam.path, "\\", line[1],
                                 " -i ", line[2],
                                 " -g ", line[3], " > ",
                                 out.path, "\\intermed\\", run.label, "_", line[2],"_",i,".summary")
@@ -144,7 +144,7 @@ prepHaplotFiles <- function(run.label, sam.path, label.path, vcf.path,
       wait.ln <- ifelse(i %% n.jobs == 0," wait;"," ")
       run.perl.script <- paste0("perl ", haptureDir,
                                 " -v ", vcf.path, " ",
-                                " -s ", sam.path, "/", line[1],
+                                " -s ", bam.path, "/", line[1],
                                 " -i ", line[2],
                                 " -g ", line[3], " > ",
                                 out.path, "/intermed/", run.label, "_", line[2],"_",i,".summary &",
@@ -166,7 +166,7 @@ prepHaplotFiles <- function(run.label, sam.path, label.path, vcf.path,
 
     concat.cmd <- paste0("cat ",out.path, "/intermed/", run.label, "_", "*.summary"," > ",summary.path)
 
-    # just in case if the user has loads of sam files and running out of buffer
+    # just in case if the user has loads of bam files and running out of buffer
     if (nrow(read.label) > 100) {
       concat.cmd <- paste0("find ",out.path, "/intermed -name ", run.label, "_", "*.summary",
                             "| while read F; do cat ${F} >>",summary.path, ";done")
