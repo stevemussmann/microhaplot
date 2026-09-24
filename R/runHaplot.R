@@ -188,7 +188,7 @@ prepHaplotFiles <- function(run.label, bam.path, label.path, vcf.path,
     system(file.path(out.path, runHap.name))
   }
 
-  haplo.sum <- read.table(summary.path, stringsAsFactors = FALSE, sep = "\t") %>% dplyr::tbl_df()
+  haplo.sum <- read.table(summary.path, stringsAsFactors = FALSE, sep = "\t") %>% dplyr::as_tibble()
 
   colnames(haplo.sum) <- c("group", "id", "locus", "haplo", "depth", "sum.Phred.C", "max.Phred.C")
 
